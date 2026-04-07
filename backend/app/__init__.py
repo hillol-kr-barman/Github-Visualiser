@@ -1,0 +1,1 @@
+"""Git Visualiser API package."""
