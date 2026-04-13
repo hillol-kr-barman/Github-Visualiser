@@ -55,6 +55,7 @@ Keep real `.env` files out of git. Frontend variables use the `VITE_` prefix bec
 - Do not request the broad GitHub OAuth `repo` scope for basic sign-in.
 - Private repository access should use read-only GitHub App permissions.
 - Do not request GitHub write permissions.
+- For local repository listing, `GITHUB_ACCESS_TOKEN` should be read-only and kept in `backend/.env`.
 
 ## GitHub Sign-In Setup
 

@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     github_app_client_secret: str = ""
     github_app_id: str = ""
     github_app_private_key_path: str = ""
+    github_access_token: str = ""
     frontend_url: str = "http://localhost:5173"
 
 
