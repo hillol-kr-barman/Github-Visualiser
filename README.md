@@ -67,3 +67,12 @@ Keep real `.env` files out of git. Frontend variables use the `VITE_` prefix bec
 6. Click `Sign in with GitHub`.
 7. Confirm the app shows signed-in state after redirect.
 8. Click `Sign out`.
+
+## Repository Listing Setup
+
+1. Add a read-only GitHub token to `backend/.env` as `GITHUB_ACCESS_TOKEN`.
+2. Start the backend and frontend.
+3. Sign in with GitHub.
+4. Click `Load repositories`.
+5. Select a repository.
+6. Confirm it appears under `Selected repository` and `Recent repositories`.
