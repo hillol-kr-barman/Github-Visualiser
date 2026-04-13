@@ -16,6 +16,7 @@ function App() {
   const [recentRepositories, setRecentRepositories] = useState<RepositorySummary[]>([])
   const [selectedRepository, setSelectedRepository] = useState<RepositorySummary | null>(null)
   const [isLoadingRepositories, setIsLoadingRepositories] = useState(false)
+  const [hasLoadedRepositories, setHasLoadedRepositories] = useState(false)
   const [repositoryError, setRepositoryError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -54,6 +55,7 @@ function App() {
 
     try {
       setRepositories(await fetchRepositories())
+      setHasLoadedRepositories(true)
     } catch (error) {
       setRepositoryError(
         error instanceof Error ? error.message : 'Repositories could not be loaded.',
@@ -126,7 +128,10 @@ function App() {
           {isLoadingRepositories ? <p>Loading repositories...</p> : null}
           {repositoryError ? <p className="error-message">{repositoryError}</p> : null}
 
-          {!isLoadingRepositories && !repositoryError && repositories.length === 0 ? (
+          {hasLoadedRepositories &&
+          !isLoadingRepositories &&
+          !repositoryError &&
+          repositories.length === 0 ? (
             <p>No repositories found for this access token.</p>
           ) : null}
 
