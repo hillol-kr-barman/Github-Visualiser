@@ -1,11 +1,24 @@
 import { useEffect, useState } from 'react'
+import {
+  Background,
+  Controls,
+  ReactFlow,
+  type Edge,
+  type Node,
+  type NodeTypes,
+} from '@xyflow/react'
 import type { Session } from '@supabase/supabase-js'
+import '@xyflow/react/dist/style.css'
 import {
   isEmbeddedBrowserContext,
   recoverSessionFromAuthRedirect,
   signInWithGitHub,
   signOut,
 } from './features/auth/authService'
+import CommitNode from './features/graph/CommitNode'
+import { fetchRepositoryGraph } from './features/graph/graphService'
+import { toReactFlowGraph } from './features/graph/graphLayout'
+import type { CommitGraphNode } from './features/graph/types'
 import { fetchRepositories } from './features/repositories/repositoryService'
 import {
   getRecentRepositories,
@@ -18,6 +31,8 @@ import {
   supabase,
 } from './lib/supabase'
 
+const nodeTypes: NodeTypes = { commit: CommitNode }
+
 function App() {
   const [session, setSession] = useState<Session | null>(null)
   const [isLoadingSession, setIsLoadingSession] = useState(true)
@@ -28,6 +43,12 @@ function App() {
   const [isLoadingRepositories, setIsLoadingRepositories] = useState(false)
   const [hasLoadedRepositories, setHasLoadedRepositories] = useState(false)
   const [repositoryError, setRepositoryError] = useState<string | null>(null)
+  const [graphNodes, setGraphNodes] = useState<Node<CommitGraphNode>[]>([])
+  const [graphEdges, setGraphEdges] = useState<Edge[]>([])
+  const [selectedCommit, setSelectedCommit] = useState<CommitGraphNode | null>(null)
+  const [isLoadingGraph, setIsLoadingGraph] = useState(false)
+  const [graphError, setGraphError] = useState<string | null>(null)
+  const [hasLoadedGraph, setHasLoadedGraph] = useState(false)
   const supabaseConfigurationIssue = getSupabaseConfigurationIssue()
 
   useEffect(() => {
@@ -107,6 +128,33 @@ function App() {
   function handleSelectRepository(repository: RepositorySummary) {
     setSelectedRepository(repository)
     setRecentRepositories(saveRecentRepository(repository))
+    setGraphNodes([])
+    setGraphEdges([])
+    setSelectedCommit(null)
+    setGraphError(null)
+    setHasLoadedGraph(false)
+  }
+
+  async function handleLoadGraph() {
+    if (!selectedRepository) {
+      return
+    }
+
+    setIsLoadingGraph(true)
+    setGraphError(null)
+    setSelectedCommit(null)
+
+    try {
+      const graph = await fetchRepositoryGraph(selectedRepository.full_name)
+      const flowGraph = toReactFlowGraph(graph)
+      setGraphNodes(flowGraph.nodes)
+      setGraphEdges(flowGraph.edges)
+      setHasLoadedGraph(true)
+    } catch (error) {
+      setGraphError(error instanceof Error ? error.message : 'Repository graph could not be loaded.')
+    } finally {
+      setIsLoadingGraph(false)
+    }
   }
 
   async function handleSignIn() {
@@ -256,6 +304,54 @@ function App() {
                 ))}
               </div>
             </section>
+          ) : null}
+        </section>
+      ) : null}
+
+      {session ? (
+        <section className="panel" aria-labelledby="repository-graph-heading">
+          <div className="repo-actions">
+            <div>
+              <h2 id="repository-graph-heading">Repository graph</h2>
+              <p className="graph-copy">
+                This graph shows recent commits as nodes and parent relationships as arrows.
+                Branch labels appear on the latest commit returned for each branch.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void handleLoadGraph()}
+              disabled={!selectedRepository || isLoadingGraph}
+            >
+              Load graph
+            </button>
+          </div>
+
+          {!selectedRepository ? <p>Select a repository to load its graph.</p> : null}
+          {isLoadingGraph ? <p>Loading graph...</p> : null}
+          {graphError ? <p className="error-message">{graphError}</p> : null}
+
+          {selectedRepository ? (
+            <div className="graph-layout">
+              <div className="graph-shell">
+                {hasLoadedGraph && !isLoadingGraph && graphNodes.length === 0 ? (
+                  <p>No graph data returned for this repository.</p>
+                ) : null}
+
+                {graphNodes.length > 0 ? (
+                  <ReactFlow
+                    nodes={graphNodes}
+                    edges={graphEdges}
+                    nodeTypes={nodeTypes}
+                    fitView
+                    onNodeClick={(_, node: Node<CommitGraphNode>) => setSelectedCommit(node.data)}
+                  >
+                    <Background />
+                    <Controls />
+                  </ReactFlow>
+                ) : null}
+              </div>
+            </div>
           ) : null}
         </section>
       ) : null}

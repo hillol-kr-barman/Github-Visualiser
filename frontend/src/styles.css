@@ -173,3 +173,76 @@ code {
   flex-wrap: wrap;
   gap: 0.75rem;
 }
+
+.graph-layout {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+.graph-copy {
+  margin-bottom: 0;
+}
+
+.graph-shell {
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 18px;
+  height: 520px;
+  overflow: hidden;
+}
+
+.graph-shell .react-flow {
+  background: rgba(2, 6, 23, 0.72);
+}
+
+.commit-node {
+  border: 1px solid rgba(56, 189, 248, 0.42);
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.94);
+  box-shadow: 0 18px 42px rgba(2, 6, 23, 0.32);
+  color: #e2e8f0;
+  display: grid;
+  gap: 0.45rem;
+  min-width: 180px;
+  padding: 0.85rem;
+}
+
+.commit-node p {
+  margin: 0;
+}
+
+.commit-node__sha {
+  color: #7dd3fc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.commit-node__message {
+  color: #f8fafc;
+  font-weight: 700;
+}
+
+.branch-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.branch-label {
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.16);
+  color: #86efac;
+  font-size: 0.72rem;
+  padding: 0.18rem 0.5rem;
+}
+
+.commit-details {
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 18px;
+  padding: 1rem;
+}
+
+.detail-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
