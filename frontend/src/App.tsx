@@ -142,7 +142,10 @@ function App() {
 
     setIsLoadingGraph(true)
     setGraphError(null)
+    setGraphNodes([])
+    setGraphEdges([])
     setSelectedCommit(null)
+    setHasLoadedGraph(false)
 
     try {
       const graph = await fetchRepositoryGraph(selectedRepository.full_name)
