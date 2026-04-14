@@ -55,7 +55,7 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (window.location.hash.includes('access_token=')) {
+    if (session && window.location.hash.includes('access_token=')) {
       window.history.replaceState(null, document.title, window.location.pathname)
     }
   }, [session])
