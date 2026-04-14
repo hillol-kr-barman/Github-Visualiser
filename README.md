@@ -86,3 +86,15 @@ curl http://localhost:8000/github/repositories/OWNER/REPO/graph
 ```
 
 The response contains `repository`, `nodes`, and `edges`.
+
+## Repository Graph Check
+
+1. Start the backend and frontend.
+2. Sign in with GitHub.
+3. Load repositories.
+4. Select a repository.
+5. Click `Load graph`.
+6. Confirm recent commits appear as graph nodes.
+7. Click a commit node and confirm `Commit details` appears.
+
+The first graph view is intentionally limited to recent commits so the app does not fetch full repository history.

@@ -241,6 +241,15 @@ code {
   padding: 1rem;
 }
 
+.commit-details h3,
+.commit-details h4 {
+  margin-top: 0;
+}
+
+.commit-details a {
+  color: #7dd3fc;
+}
+
 .detail-grid {
   display: grid;
   gap: 1rem;

@@ -351,6 +351,79 @@ function App() {
                   </ReactFlow>
                 ) : null}
               </div>
+
+              <aside className="commit-details" aria-label="Commit details">
+                <h3>Commit details</h3>
+                {!selectedCommit ? <p>Select a commit node to see details.</p> : null}
+
+                {selectedCommit ? (
+                  <div className="detail-grid">
+                    <div>
+                      <h4>Commit</h4>
+                      <p>{selectedCommit.message}</p>
+                      <p>{selectedCommit.sha}</p>
+                    </div>
+                    <div>
+                      <h4>Author</h4>
+                      <p>
+                        {selectedCommit.author_name ||
+                          selectedCommit.author_login ||
+                          'Unknown author'}
+                      </p>
+                      <p>{selectedCommit.authored_at ?? 'Unknown date'}</p>
+                    </div>
+                    <div>
+                      <h4>Parents</h4>
+                      <p>{selectedCommit.parents.length}</p>
+                      <p>
+                        {selectedCommit.parents.length > 0
+                          ? selectedCommit.parents.join(', ')
+                          : 'No fetched parents.'}
+                      </p>
+                    </div>
+                    <div>
+                      <h4>Branches</h4>
+                      {selectedCommit.branch_labels.length > 0 ? (
+                        <div className="branch-labels">
+                          {selectedCommit.branch_labels.map((branch) => (
+                            <span className="branch-label" key={branch}>
+                              {branch}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <p>No branch labels in fetched window.</p>
+                      )}
+                    </div>
+                    <div>
+                      <h4>Pull requests</h4>
+                      {selectedCommit.pull_requests.length > 0 ? (
+                        <ul>
+                          {selectedCommit.pull_requests.map((pullRequest) => (
+                            <li key={pullRequest.number}>
+                              <a
+                                href={pullRequest.html_url}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                #{pullRequest.number} {pullRequest.title}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>No pull request context available.</p>
+                      )}
+                    </div>
+                    <div>
+                      <h4>GitHub</h4>
+                      <a href={selectedCommit.html_url} target="_blank" rel="noreferrer">
+                        Open commit on GitHub
+                      </a>
+                    </div>
+                  </div>
+                ) : null}
+              </aside>
             </div>
           ) : null}
         </section>
