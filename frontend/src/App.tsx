@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import {
   isEmbeddedBrowserContext,
+  recoverSessionFromAuthRedirect,
   signInWithGitHub,
   signOut,
 } from './features/auth/authService'
@@ -11,7 +12,11 @@ import {
   saveRecentRepository,
 } from './features/repositories/recentRepositories'
 import type { RepositorySummary } from './features/repositories/types'
-import { isSupabaseConfigured, supabase } from './lib/supabase'
+import {
+  getSupabaseConfigurationIssue,
+  isSupabaseConfigured,
+  supabase,
+} from './lib/supabase'
 
 function App() {
   const [session, setSession] = useState<Session | null>(null)
@@ -23,11 +28,35 @@ function App() {
   const [isLoadingRepositories, setIsLoadingRepositories] = useState(false)
   const [hasLoadedRepositories, setHasLoadedRepositories] = useState(false)
   const [repositoryError, setRepositoryError] = useState<string | null>(null)
+  const supabaseConfigurationIssue = getSupabaseConfigurationIssue()
 
   useEffect(() => {
     let isMounted = true
 
-    supabase.auth.getSession().then(({ data, error }) => {
+    async function initializeSession() {
+      if (supabaseConfigurationIssue) {
+        setIsLoadingSession(false)
+        return
+      }
+
+      const recovered = await recoverSessionFromAuthRedirect()
+
+      if (!isMounted) {
+        return
+      }
+
+      if (recovered.error) {
+        setAuthError(recovered.error.message)
+      }
+
+      if (recovered.session) {
+        setSession(recovered.session)
+        setIsLoadingSession(false)
+        return
+      }
+
+      const { data, error } = await supabase.auth.getSession()
+
       if (isMounted) {
         if (error) {
           setAuthError(error.message)
@@ -35,7 +64,9 @@ function App() {
         setSession(data.session)
         setIsLoadingSession(false)
       }
-    })
+    }
+
+    void initializeSession()
 
     const {
       data: { subscription },
@@ -48,17 +79,11 @@ function App() {
       isMounted = false
       subscription.unsubscribe()
     }
-  }, [])
+  }, [supabaseConfigurationIssue])
 
   useEffect(() => {
     setRecentRepositories(getRecentRepositories())
   }, [])
-
-  useEffect(() => {
-    if (session && window.location.hash.includes('access_token=')) {
-      window.history.replaceState(null, document.title, window.location.pathname)
-    }
-  }, [session])
 
   const userLabel =
     session?.user.email ?? session?.user.user_metadata.user_name ?? session?.user.id
@@ -92,6 +117,11 @@ function App() {
       return
     }
 
+    if (supabaseConfigurationIssue) {
+      setAuthError(supabaseConfigurationIssue)
+      return
+    }
+
     const { error } = await signInWithGitHub()
 
     if (error) {
@@ -119,11 +149,18 @@ function App() {
             Add Supabase values to <code>frontend/.env</code> to enable GitHub sign-in.
           </p>
         ) : null}
+        {isSupabaseConfigured && supabaseConfigurationIssue ? (
+          <p className="notice">{supabaseConfigurationIssue}</p>
+        ) : null}
 
         {isLoadingSession ? <p>Checking session...</p> : null}
 
         {!isLoadingSession && !session ? (
-          <button type="button" onClick={() => void handleSignIn()}>
+          <button
+            type="button"
+            onClick={() => void handleSignIn()}
+            disabled={Boolean(supabaseConfigurationIssue)}
+          >
             Sign in with GitHub
           </button>
         ) : null}
