@@ -8,7 +8,7 @@ function CommitNode({ data }: NodeProps<CommitFlowNode>) {
 
   return (
     <article className="commit-node">
-      <Handle className="commit-node__handle" type="target" position={Position.Bottom} />
+      <Handle className="commit-node__handle" type="target" position={Position.Top} />
       <strong className="commit-node__sha">{data.short_sha}</strong>
       <p className="commit-node__message">{data.message}</p>
       <p>{author}</p>
@@ -21,7 +21,7 @@ function CommitNode({ data }: NodeProps<CommitFlowNode>) {
           ))}
         </div>
       ) : null}
-      <Handle className="commit-node__handle" type="source" position={Position.Top} />
+      <Handle className="commit-node__handle" type="source" position={Position.Bottom} />
     </article>
   )
 }
