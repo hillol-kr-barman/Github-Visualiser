@@ -76,3 +76,13 @@ Keep real `.env` files out of git. Frontend variables use the `VITE_` prefix bec
 4. Click `Load repositories`.
 5. Select a repository.
 6. Confirm it appears under `Selected repository` and `Recent repositories`.
+
+## Repository Graph API Check
+
+After selecting a repository, the backend graph endpoint can be checked with:
+
+```bash
+curl http://localhost:8000/github/repositories/OWNER/REPO/graph
+```
+
+The response contains `repository`, `nodes`, and `edges`.

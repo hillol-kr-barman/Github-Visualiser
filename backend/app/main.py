@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.github import list_repositories
+from app.github import get_repository_graph, list_repositories
 from app.settings import settings
 
 app = FastAPI(title="Git Visualiser API")
@@ -30,3 +30,8 @@ def public_config() -> dict[str, str]:
 @app.get("/github/repositories")
 async def github_repositories() -> dict[str, list[dict[str, object]]]:
     return {"repositories": await list_repositories()}
+
+
+@app.get("/github/repositories/{owner}/{repo}/graph")
+async def github_repository_graph(owner: str, repo: str) -> dict[str, object]:
+    return await get_repository_graph(owner, repo)
