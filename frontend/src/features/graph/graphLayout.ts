@@ -13,13 +13,16 @@ export function toReactFlowGraph(graph: CommitGraph): {
       id: commit.sha,
       type: 'commit',
       data: commit,
-      position: { x: index * 220, y: (index % 4) * 140 },
+      position: { x: 120, y: index * 150 },
     })),
     edges: graph.edges.map((edge) => ({
       id: edge.id,
       source: edge.source,
       target: edge.target,
       animated: false,
+      type: 'smoothstep',
+      style: { stroke: '#38bdf8', strokeWidth: 2 },
+      markerEnd: { type: 'arrowclosed', color: '#38bdf8' },
     })),
   }
 }

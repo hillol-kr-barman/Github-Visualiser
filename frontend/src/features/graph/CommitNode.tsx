@@ -1,4 +1,4 @@
-import type { Node, NodeProps } from '@xyflow/react'
+import { Handle, Position, type Node, type NodeProps } from '@xyflow/react'
 import type { CommitGraphNode } from './types'
 
 type CommitFlowNode = Node<CommitGraphNode, 'commit'>
@@ -8,6 +8,7 @@ function CommitNode({ data }: NodeProps<CommitFlowNode>) {
 
   return (
     <article className="commit-node">
+      <Handle className="commit-node__handle" type="target" position={Position.Bottom} />
       <strong className="commit-node__sha">{data.short_sha}</strong>
       <p className="commit-node__message">{data.message}</p>
       <p>{author}</p>
@@ -20,6 +21,7 @@ function CommitNode({ data }: NodeProps<CommitFlowNode>) {
           ))}
         </div>
       ) : null}
+      <Handle className="commit-node__handle" type="source" position={Position.Top} />
     </article>
   )
 }

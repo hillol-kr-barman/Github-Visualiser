@@ -205,6 +205,14 @@ code {
   gap: 0.45rem;
   min-width: 180px;
   padding: 0.85rem;
+  position: relative;
+}
+
+.commit-node__handle {
+  background: #38bdf8;
+  border: 2px solid #082f49;
+  height: 10px;
+  width: 10px;
 }
 
 .commit-node p {
