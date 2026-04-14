@@ -1,5 +1,13 @@
 import { supabase } from '../../lib/supabase'
 
+export function isEmbeddedBrowserContext() {
+  try {
+    return window.self !== window.top
+  } catch {
+    return true
+  }
+}
+
 export async function signInWithGitHub() {
   return supabase.auth.signInWithOAuth({
     provider: 'github',

@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { signInWithGitHub, signOut } from './features/auth/authService'
+import {
+  isEmbeddedBrowserContext,
+  signInWithGitHub,
+  signOut,
+} from './features/auth/authService'
 import { fetchRepositories } from './features/repositories/repositoryService'
 import {
   getRecentRepositories,
@@ -12,6 +16,7 @@ import { isSupabaseConfigured, supabase } from './lib/supabase'
 function App() {
   const [session, setSession] = useState<Session | null>(null)
   const [isLoadingSession, setIsLoadingSession] = useState(true)
+  const [authError, setAuthError] = useState<string | null>(null)
   const [repositories, setRepositories] = useState<RepositorySummary[]>([])
   const [recentRepositories, setRecentRepositories] = useState<RepositorySummary[]>([])
   const [selectedRepository, setSelectedRepository] = useState<RepositorySummary | null>(null)
@@ -22,8 +27,11 @@ function App() {
   useEffect(() => {
     let isMounted = true
 
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(({ data, error }) => {
       if (isMounted) {
+        if (error) {
+          setAuthError(error.message)
+        }
         setSession(data.session)
         setIsLoadingSession(false)
       }
@@ -45,6 +53,12 @@ function App() {
   useEffect(() => {
     setRecentRepositories(getRecentRepositories())
   }, [])
+
+  useEffect(() => {
+    if (window.location.hash.includes('access_token=')) {
+      window.history.replaceState(null, document.title, window.location.pathname)
+    }
+  }, [session])
 
   const userLabel =
     session?.user.email ?? session?.user.user_metadata.user_name ?? session?.user.id
@@ -68,6 +82,21 @@ function App() {
   function handleSelectRepository(repository: RepositorySummary) {
     setSelectedRepository(repository)
     setRecentRepositories(saveRecentRepository(repository))
+  }
+
+  async function handleSignIn() {
+    setAuthError(null)
+
+    if (isEmbeddedBrowserContext()) {
+      setAuthError('Open http://localhost:5173 in a normal browser tab before signing in.')
+      return
+    }
+
+    const { error } = await signInWithGitHub()
+
+    if (error) {
+      setAuthError(error.message)
+    }
   }
 
   return (
@@ -94,10 +123,11 @@ function App() {
         {isLoadingSession ? <p>Checking session...</p> : null}
 
         {!isLoadingSession && !session ? (
-          <button type="button" onClick={() => void signInWithGitHub()}>
+          <button type="button" onClick={() => void handleSignIn()}>
             Sign in with GitHub
           </button>
         ) : null}
+        {authError ? <p className="error-message">{authError}</p> : null}
 
         {!isLoadingSession && session ? (
           <div className="auth-state">
@@ -114,7 +144,10 @@ function App() {
           <div className="repo-actions">
             <div>
               <h2 id="repositories-heading">Repositories</h2>
-              <p>Load repositories available to the configured read-only backend token.</p>
+              <p>
+                Load repositories available to the configured read-only backend token. This
+                is separate from GitHub sign-in.
+              </p>
             </div>
             <button
               type="button"
