@@ -98,3 +98,11 @@ The response contains `repository`, `nodes`, and `edges`.
 7. Click a commit node and confirm `Commit details` appears.
 
 The first graph view is intentionally limited to recent commits so the app does not fetch full repository history.
+
+## Refresh Check
+
+1. Select a repository.
+2. Click `Load graph`.
+3. Confirm `Last refreshed` appears.
+4. Click `Refresh graph`.
+5. Confirm the graph stays visible while refresh status updates.

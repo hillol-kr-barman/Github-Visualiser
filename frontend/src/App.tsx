@@ -18,7 +18,7 @@ import {
 import CommitNode from './features/graph/CommitNode'
 import { fetchRepositoryGraph } from './features/graph/graphService'
 import { toReactFlowGraph } from './features/graph/graphLayout'
-import type { CommitGraphNode } from './features/graph/types'
+import type { CommitGraphNode, GraphSyncMetadata } from './features/graph/types'
 import { fetchRepositories } from './features/repositories/repositoryService'
 import {
   getRecentRepositories,
@@ -49,6 +49,8 @@ function App() {
   const [isLoadingGraph, setIsLoadingGraph] = useState(false)
   const [graphError, setGraphError] = useState<string | null>(null)
   const [hasLoadedGraph, setHasLoadedGraph] = useState(false)
+  const [graphSync, setGraphSync] = useState<GraphSyncMetadata | null>(null)
+  const [lastRefreshError, setLastRefreshError] = useState<string | null>(null)
   const supabaseConfigurationIssue = getSupabaseConfigurationIssue()
 
   useEffect(() => {
@@ -132,6 +134,8 @@ function App() {
     setGraphEdges([])
     setSelectedCommit(null)
     setGraphError(null)
+    setGraphSync(null)
+    setLastRefreshError(null)
     setHasLoadedGraph(false)
   }
 
@@ -142,19 +146,21 @@ function App() {
 
     setIsLoadingGraph(true)
     setGraphError(null)
-    setGraphNodes([])
-    setGraphEdges([])
+    setLastRefreshError(null)
     setSelectedCommit(null)
-    setHasLoadedGraph(false)
 
     try {
       const graph = await fetchRepositoryGraph(selectedRepository.full_name)
       const flowGraph = toReactFlowGraph(graph)
       setGraphNodes(flowGraph.nodes)
       setGraphEdges(flowGraph.edges)
+      setGraphSync(graph.sync)
+      setLastRefreshError(null)
       setHasLoadedGraph(true)
     } catch (error) {
-      setGraphError(error instanceof Error ? error.message : 'Repository graph could not be loaded.')
+      const message = error instanceof Error ? error.message : 'Repository graph could not be loaded.'
+      setGraphError(message)
+      setLastRefreshError(error instanceof Error ? error.message : 'Repository graph could not be loaded.')
     } finally {
       setIsLoadingGraph(false)
     }
@@ -326,16 +332,29 @@ function App() {
               onClick={() => void handleLoadGraph()}
               disabled={!selectedRepository || isLoadingGraph}
             >
-              Load graph
+              {hasLoadedGraph ? 'Refresh graph' : 'Load graph'}
             </button>
           </div>
 
           {!selectedRepository ? <p>Select a repository to load its graph.</p> : null}
-          {isLoadingGraph ? <p>Loading graph...</p> : null}
+          {isLoadingGraph ? <p>Refreshing graph...</p> : null}
           {graphError ? <p className="error-message">{graphError}</p> : null}
 
           {selectedRepository ? (
             <div className="graph-layout">
+              <div className="refresh-status">
+                {graphSync ? (
+                  <p>Last refreshed {new Date(graphSync.fetched_at).toLocaleString()}</p>
+                ) : null}
+                {graphSync?.rate_limit_remaining !== null &&
+                graphSync?.rate_limit_remaining !== undefined ? (
+                  <p>GitHub requests remaining: {graphSync.rate_limit_remaining}</p>
+                ) : null}
+                {lastRefreshError ? (
+                  <p className="error-message">Refresh failed: {lastRefreshError}</p>
+                ) : null}
+              </div>
+
               <div className="graph-shell">
                 {hasLoadedGraph && !isLoadingGraph && graphNodes.length === 0 ? (
                   <p>No graph data returned for this repository.</p>
