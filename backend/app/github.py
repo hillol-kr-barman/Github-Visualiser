@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Any
 
 import httpx
@@ -30,6 +31,31 @@ def _github_headers() -> dict[str, str]:
         "Accept": "application/vnd.github+json",
         "Authorization": f"Bearer {settings.github_access_token}",
         "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+
+def _utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _rate_limit_reset_iso(value: str | None) -> str | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromtimestamp(int(value), tz=timezone.utc).isoformat().replace(
+            "+00:00",
+            "Z",
+        )
+    except ValueError:
+        return None
+
+
+def _graph_sync_metadata(response: httpx.Response) -> dict[str, Any]:
+    remaining = response.headers.get("X-RateLimit-Remaining")
+    return {
+        "fetched_at": _utc_now_iso(),
+        "rate_limit_remaining": int(remaining) if remaining and remaining.isdigit() else None,
+        "rate_limit_reset": _rate_limit_reset_iso(response.headers.get("X-RateLimit-Reset")),
     }
 
 
@@ -183,4 +209,5 @@ async def get_repository_graph(owner: str, repo: str) -> dict[str, Any]:
         "repository": {"owner": owner, "name": repo, "full_name": f"{owner}/{repo}"},
         "nodes": nodes,
         "edges": edges,
+        "sync": _graph_sync_metadata(commits_response),
     }

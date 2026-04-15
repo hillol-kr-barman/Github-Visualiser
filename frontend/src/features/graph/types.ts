@@ -23,8 +23,15 @@ export type CommitGraphEdge = {
   target: string
 }
 
+export type GraphSyncMetadata = {
+  fetched_at: string
+  rate_limit_remaining: number | null
+  rate_limit_reset: string | null
+}
+
 export type CommitGraph = {
   repository: GraphRepository
   nodes: CommitGraphNode[]
   edges: CommitGraphEdge[]
+  sync: GraphSyncMetadata
 }
