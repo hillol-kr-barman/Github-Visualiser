@@ -195,6 +195,25 @@ code {
   margin: 0;
 }
 
+.refresh-controls {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.refresh-controls p {
+  margin: 0;
+}
+
+.auto-refresh-toggle {
+  align-items: center;
+  color: #e2e8f0;
+  display: inline-flex;
+  gap: 0.5rem;
+  font-weight: 700;
+}
+
 .graph-shell {
   border: 1px solid rgba(148, 163, 184, 0.22);
   border-radius: 18px;

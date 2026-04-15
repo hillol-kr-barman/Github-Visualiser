@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Background,
   Controls,
@@ -32,6 +32,7 @@ import {
 } from './lib/supabase'
 
 const nodeTypes: NodeTypes = { commit: CommitNode }
+const AUTO_REFRESH_INTERVAL_MS = 5 * 60 * 1000
 
 function App() {
   const [session, setSession] = useState<Session | null>(null)
@@ -51,6 +52,8 @@ function App() {
   const [hasLoadedGraph, setHasLoadedGraph] = useState(false)
   const [graphSync, setGraphSync] = useState<GraphSyncMetadata | null>(null)
   const [lastRefreshError, setLastRefreshError] = useState<string | null>(null)
+  const [isAutoRefreshEnabled, setIsAutoRefreshEnabled] = useState(false)
+  const isGraphRefreshInFlight = useRef(false)
   const supabaseConfigurationIssue = getSupabaseConfigurationIssue()
 
   useEffect(() => {
@@ -95,6 +98,9 @@ function App() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession)
+      if (!nextSession) {
+        setIsAutoRefreshEnabled(false)
+      }
       setIsLoadingSession(false)
     })
 
@@ -136,14 +142,20 @@ function App() {
     setGraphError(null)
     setGraphSync(null)
     setLastRefreshError(null)
+    setIsAutoRefreshEnabled(false)
     setHasLoadedGraph(false)
   }
 
-  async function handleLoadGraph() {
+  const handleLoadGraph = useCallback(async () => {
+    if (isGraphRefreshInFlight.current) {
+      return
+    }
+
     if (!selectedRepository) {
       return
     }
 
+    isGraphRefreshInFlight.current = true
     setIsLoadingGraph(true)
     setGraphError(null)
     setLastRefreshError(null)
@@ -162,9 +174,24 @@ function App() {
       setGraphError(message)
       setLastRefreshError(error instanceof Error ? error.message : 'Repository graph could not be loaded.')
     } finally {
+      isGraphRefreshInFlight.current = false
       setIsLoadingGraph(false)
     }
-  }
+  }, [selectedRepository])
+
+  useEffect(() => {
+    if (!session || !isAutoRefreshEnabled || !selectedRepository || !hasLoadedGraph) {
+      return undefined
+    }
+
+    const intervalId = window.setInterval(() => {
+      void handleLoadGraph()
+    }, AUTO_REFRESH_INTERVAL_MS)
+
+    return () => {
+      window.clearInterval(intervalId)
+    }
+  }, [handleLoadGraph, hasLoadedGraph, isAutoRefreshEnabled, selectedRepository, session])
 
   async function handleSignIn() {
     setAuthError(null)
@@ -353,6 +380,22 @@ function App() {
                 {lastRefreshError ? (
                   <p className="error-message">Refresh failed: {lastRefreshError}</p>
                 ) : null}
+              </div>
+
+              <div className="refresh-controls">
+                <label className="auto-refresh-toggle">
+                  <input
+                    type="checkbox"
+                    checked={isAutoRefreshEnabled}
+                    disabled={!hasLoadedGraph}
+                    onChange={(event) => setIsAutoRefreshEnabled(event.target.checked)}
+                  />
+                  <span>Auto-refresh</span>
+                </label>
+                <p>
+                  {isAutoRefreshEnabled ? 'Auto-refresh is on.' : 'Auto-refresh is off.'}{' '}
+                  Every 5 minutes.
+                </p>
               </div>
 
               <div className="graph-shell">

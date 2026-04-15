@@ -106,3 +106,7 @@ The first graph view is intentionally limited to recent commits so the app does 
 3. Confirm `Last refreshed` appears.
 4. Click `Refresh graph`.
 5. Confirm the graph stays visible while refresh status updates.
+6. Enable `Auto-refresh`.
+7. Confirm the UI says `Auto-refresh is on.` and `Every 5 minutes`.
+8. Disable `Auto-refresh`.
+9. Confirm the UI says `Auto-refresh is off.`
