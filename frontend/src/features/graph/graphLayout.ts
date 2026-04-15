@@ -28,11 +28,30 @@ function timelineEdges(commits: CommitGraphNode[]): Edge[] {
   )
 }
 
+function firstParentEdges(commits: CommitGraphNode[]): Edge[] {
+  const fetchedShas = new Set(commits.map((commit) => commit.sha))
+
+  return commits.flatMap((commit) => {
+    const firstFetchedParent = commit.parents.find((parentSha) => fetchedShas.has(parentSha))
+
+    if (!firstFetchedParent) {
+      return []
+    }
+
+    return toFlowEdge({
+      id: `first-parent-${commit.sha}-${firstFetchedParent}`,
+      source: commit.sha,
+      target: firstFetchedParent,
+    })
+  })
+}
+
 export function toReactFlowGraph(graph: CommitGraph): {
   nodes: CommitFlowNode[]
   edges: Edge[]
 } {
-  const graphEdges = graph.edges.length > 0 ? graph.edges.map(toFlowEdge) : timelineEdges(graph.nodes)
+  const readableEdges = firstParentEdges(graph.nodes)
+  const graphEdges = readableEdges.length > 0 ? readableEdges : timelineEdges(graph.nodes)
 
   return {
     nodes: graph.nodes.map((commit, index) => ({
