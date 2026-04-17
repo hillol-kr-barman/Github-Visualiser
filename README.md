@@ -110,3 +110,14 @@ The first graph view is intentionally limited to recent commits so the app does 
 7. Confirm the UI says `Auto-refresh is on.` and `Every 5 minutes`.
 8. Disable `Auto-refresh`.
 9. Confirm the UI says `Auto-refresh is off.`
+
+## Deployment Notes
+
+The app can be deployed without buying a new domain.
+
+- Deploy the frontend from `frontend/` on Vercel.
+- Deploy the backend from `backend/` on Railway.
+- Set `VITE_API_BASE_URL` in Vercel to the Railway backend URL.
+- Set `FRONTEND_URL` in Railway to the Vercel frontend URL.
+- Keep `GITHUB_ACCESS_TOKEN` only in Railway backend environment variables.
+- Add the deployed frontend URL to Supabase/GitHub OAuth redirect settings.
