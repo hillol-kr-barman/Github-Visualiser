@@ -219,6 +219,7 @@ function App() {
         <p className="eyebrow">Portfolio project</p>
         <h1>Git Visualiser</h1>
         <p>Connect GitHub, choose a repository, and visualise its workflow.</p>
+        <p>Read-only GitHub repository visualisation focused on recent commit activity.</p>
       </section>
 
       <section className="panel" aria-labelledby="backend-status-heading">
@@ -352,6 +353,9 @@ function App() {
               <p className="graph-copy">
                 This graph shows recent commits as nodes and parent relationships as arrows.
                 Branch labels appear on the latest commit returned for each branch.
+              </p>
+              <p className="graph-copy">
+                The v1 graph focuses on recent commits and keeps repository access read-only.
               </p>
             </div>
             <button
