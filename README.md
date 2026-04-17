@@ -80,7 +80,7 @@ The app can be deployed without buying a new domain.
 - Set `FRONTEND_URL` in Railway to the Vercel frontend URL.
 - Keep `GITHUB_ACCESS_TOKEN` only in Railway backend environment variables.
 - Add the deployed frontend URL to Supabase/GitHub OAuth redirect settings.
-- Deployment can use the free generated Vercel and Railway URLs.
+- Deployment can use the free generated Vercel and Railway URLs; a custom domain can be added later but is not required.
 
 ## v1 Limitations
 
