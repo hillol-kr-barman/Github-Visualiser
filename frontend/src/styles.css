@@ -2,7 +2,7 @@
 
 :root {
   color: #172026;
-  background: #fffaf0;
+  background: #f6fbfd;
   font-family:
     "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
@@ -11,9 +11,9 @@
 
   --color-accent: #04d9ff;
   --color-accent-strong: #00aeca;
-  --color-background: #fffaf0;
-  --color-background-soft: #fffdf7;
-  --color-surface: rgba(255, 255, 255, 0.88);
+  --color-background: #f6fbfd;
+  --color-background-soft: #fbfeff;
+  --color-surface: rgba(255, 255, 255, 0.92);
   --color-surface-strong: #ffffff;
   --color-border: rgba(23, 32, 38, 0.12);
   --color-border-strong: rgba(0, 174, 202, 0.28);
@@ -34,9 +34,7 @@
 }
 
 html {
-  background:
-    radial-gradient(circle at top left, rgba(4, 217, 255, 0.18), transparent 30rem),
-    linear-gradient(180deg, #fffdf7 0%, var(--color-background) 52%, #f5fbfc 100%);
+  background: var(--color-background);
 }
 
 body {
@@ -118,23 +116,140 @@ input:focus-visible {
 }
 
 .hero {
-  background:
-    linear-gradient(135deg, rgba(4, 217, 255, 0.22), transparent 34rem),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 253, 247, 0.88));
+  align-items: stretch;
+  background: var(--color-surface-strong);
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: minmax(0, 1fr);
   overflow: hidden;
   position: relative;
 }
 
+.hero::before,
 .hero::after {
-  background:
-    linear-gradient(90deg, rgba(4, 217, 255, 0.4), transparent 68%),
-    linear-gradient(90deg, rgba(23, 32, 38, 0.16), transparent 42%);
-  bottom: 0;
   content: "";
-  height: 3px;
-  left: 0;
   position: absolute;
+}
+
+.hero::before {
+  border-bottom: 1px solid rgba(4, 217, 255, 0.22);
+  border-top: 1px solid rgba(4, 217, 255, 0.22);
+  height: 3.1rem;
+  left: 0;
   right: 0;
+  top: 1.1rem;
+}
+
+.hero::after {
+  border: 1px solid rgba(4, 217, 255, 0.28);
+  bottom: 1rem;
+  height: 4.5rem;
+  right: -1.5rem;
+  width: 8rem;
+}
+
+.hero-copy {
+  align-content: center;
+  display: grid;
+  max-width: 39rem;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-graph-card {
+  align-self: center;
+  background: #fbfeff;
+  border: 1px solid rgba(23, 32, 38, 0.12);
+  border-radius: 8px;
+  box-shadow: 0 18px 42px rgba(43, 58, 65, 0.11);
+  display: grid;
+  gap: 0;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-graph-card__bar,
+.hero-graph-card__footer {
+  align-items: center;
+  color: #607179;
+  display: flex;
+  flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  gap: 0.65rem;
+  justify-content: space-between;
+  padding: 0.7rem 0.85rem;
+}
+
+.hero-graph-card__bar {
+  border-bottom: 1px solid rgba(23, 32, 38, 0.1);
+}
+
+.hero-graph-card__footer {
+  border-top: 1px solid rgba(23, 32, 38, 0.1);
+}
+
+.hero-graph {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.1rem;
+  position: relative;
+}
+
+.hero-graph::before {
+  background: var(--color-accent);
+  bottom: 2rem;
+  content: "";
+  left: 1.45rem;
+  position: absolute;
+  top: 2rem;
+  width: 2px;
+}
+
+.hero-commit {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid rgba(23, 32, 38, 0.1);
+  border-radius: 8px;
+  display: grid;
+  gap: 0.35rem 0.65rem;
+  grid-template-columns: auto minmax(0, auto) minmax(0, 1fr);
+  min-width: 0;
+  padding: 0.75rem;
+  position: relative;
+}
+
+.hero-commit--active {
+  border-color: rgba(0, 174, 202, 0.38);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+.hero-commit__dot {
+  background: var(--color-accent);
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px rgba(0, 174, 202, 0.36);
+  height: 0.8rem;
+  width: 0.8rem;
+}
+
+.hero-commit__sha {
+  color: #007f94;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.hero-commit__message {
+  color: var(--color-text);
+  font-size: 0.86rem;
+  font-weight: 800;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .eyebrow {
@@ -441,9 +556,7 @@ a:hover {
 }
 
 .graph-shell .react-flow {
-  background:
-    radial-gradient(circle at top left, rgba(4, 217, 255, 0.14), transparent 22rem),
-    #fbfeff;
+  background: #fbfeff;
 }
 
 .react-flow__attribution {
@@ -585,6 +698,12 @@ a:hover {
   }
 }
 
+@media (min-width: 860px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.72fr);
+  }
+}
+
 @media (max-width: 720px) {
   .repo-actions {
     display: grid;
@@ -604,6 +723,14 @@ a:hover {
 
   h1 {
     font-size: 2.55rem;
+  }
+
+  .hero-commit {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .hero-commit__message {
+    grid-column: 2;
   }
 }
 

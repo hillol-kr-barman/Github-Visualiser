@@ -216,10 +216,39 @@ function App() {
   return (
     <main className="app-shell">
       <section className="hero">
-        <p className="eyebrow">Portfolio project</p>
-        <h1>Git Visualiser</h1>
-        <p>Connect GitHub, choose a repository, and visualise its workflow.</p>
-        <p>Read-only GitHub repository visualisation focused on recent commit activity.</p>
+        <div className="hero-copy">
+          <p className="eyebrow">Portfolio project</p>
+          <h1>Git Visualiser</h1>
+          <p>Connect GitHub, choose a repository, and visualise its workflow.</p>
+          <p>Read-only GitHub repository visualisation focused on recent commit activity.</p>
+        </div>
+        <div className="hero-graph-card" aria-hidden="true">
+          <div className="hero-graph-card__bar">
+            <span>repo/main</span>
+            <span>read-only</span>
+          </div>
+          <div className="hero-graph">
+            <div className="hero-commit hero-commit--active">
+              <span className="hero-commit__dot" />
+              <span className="hero-commit__sha">a8f42c1</span>
+              <span className="hero-commit__message">Load graph</span>
+            </div>
+            <div className="hero-commit">
+              <span className="hero-commit__dot" />
+              <span className="hero-commit__sha">7b31d9a</span>
+              <span className="hero-commit__message">Branch labels</span>
+            </div>
+            <div className="hero-commit">
+              <span className="hero-commit__dot" />
+              <span className="hero-commit__sha">1d09ef4</span>
+              <span className="hero-commit__message">Commit details</span>
+            </div>
+          </div>
+          <div className="hero-graph-card__footer">
+            <span>3 branches</span>
+            <span>24 commits</span>
+          </div>
+        </div>
       </section>
 
       <section className="panel" aria-labelledby="backend-status-heading">
