@@ -1,281 +1,536 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+
 :root {
-  color: #f8fafc;
-  background: #0f172a;
+  color: #172026;
+  background: #fffaf0;
   font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+    "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  --color-accent: #04d9ff;
+  --color-accent-strong: #00aeca;
+  --color-background: #fffaf0;
+  --color-background-soft: #fffdf7;
+  --color-surface: rgba(255, 255, 255, 0.88);
+  --color-surface-strong: #ffffff;
+  --color-border: rgba(23, 32, 38, 0.12);
+  --color-border-strong: rgba(0, 174, 202, 0.28);
+  --color-text: #172026;
+  --color-muted: #5e6a72;
+  --color-soft: #edf9fb;
+  --color-danger: #b42318;
+  --shadow-panel: 0 20px 60px rgba(43, 58, 65, 0.12);
+  --shadow-button: 0 10px 24px rgba(4, 217, 255, 0.26);
+  --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono", "SFMono-Regular", Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background:
+    radial-gradient(circle at top left, rgba(4, 217, 255, 0.18), transparent 30rem),
+    linear-gradient(180deg, #fffdf7 0%, var(--color-background) 52%, #f5fbfc 100%);
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: transparent;
+}
+
+button,
+a {
+  font-family: var(--font-mono);
 }
 
 button {
-  border: 0;
-  border-radius: 999px;
-  background: #38bdf8;
-  color: #082f49;
+  align-items: center;
+  border: 1px solid rgba(0, 174, 202, 0.32);
+  border-radius: 8px;
+  background: var(--color-accent);
+  box-shadow: var(--shadow-button);
+  color: #052126;
   cursor: pointer;
+  display: inline-flex;
   font: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
   font-weight: 700;
-  padding: 0.85rem 1.15rem;
+  justify-content: center;
+  line-height: 1.2;
+  max-width: 100%;
+  min-height: 2.75rem;
+  overflow-wrap: anywhere;
+  padding: 0.78rem 1rem;
+  text-align: center;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
 }
 
 button:disabled {
+  box-shadow: none;
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.56;
 }
 
-button:hover {
-  background: #7dd3fc;
+button:not(:disabled):hover {
+  background: #5be8ff;
+  border-color: rgba(0, 174, 202, 0.46);
+  transform: translateY(-1px);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgba(4, 217, 255, 0.42);
+  outline-offset: 3px;
 }
 
 .app-shell {
   display: grid;
-  gap: 1.5rem;
+  gap: 1.25rem;
   margin: 0 auto;
-  max-width: 960px;
-  padding: 4rem 1.5rem;
+  max-width: 1180px;
+  padding: 3rem 1rem 4rem;
+  width: 100%;
 }
 
 .hero,
 .panel {
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  border-radius: 24px;
-  background: rgba(15, 23, 42, 0.82);
-  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.35);
-  padding: 2rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-panel);
+  min-width: 0;
+  padding: 1.25rem;
 }
 
 .hero {
   background:
-    radial-gradient(circle at top left, rgba(56, 189, 248, 0.28), transparent 35%),
-    rgba(15, 23, 42, 0.92);
+    linear-gradient(135deg, rgba(4, 217, 255, 0.22), transparent 34rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 253, 247, 0.88));
+  overflow: hidden;
+  position: relative;
+}
+
+.hero::after {
+  background:
+    linear-gradient(90deg, rgba(4, 217, 255, 0.4), transparent 68%),
+    linear-gradient(90deg, rgba(23, 32, 38, 0.16), transparent 42%);
+  bottom: 0;
+  content: "";
+  height: 3px;
+  left: 0;
+  position: absolute;
+  right: 0;
 }
 
 .eyebrow {
-  color: #38bdf8;
-  font-size: 0.78rem;
+  color: var(--color-accent-strong);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   margin: 0 0 0.75rem;
   text-transform: uppercase;
 }
 
 h1,
 h2,
+h3,
+h4,
 p {
   margin-top: 0;
 }
 
+h1,
+h2,
+h3,
+h4 {
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
 h1 {
-  font-size: clamp(2.5rem, 6vw, 5rem);
-  line-height: 0.95;
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: 1rem;
+  max-width: 12ch;
+}
+
+h2 {
+  font-size: 1.35rem;
+  line-height: 1.2;
+  margin-bottom: 0.65rem;
+}
+
+h3 {
+  font-size: 1rem;
+  line-height: 1.25;
+  margin-bottom: 0.5rem;
+}
+
+h4 {
+  font-size: 0.82rem;
+  line-height: 1.3;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
 }
 
 p {
-  color: #cbd5e1;
-  line-height: 1.7;
+  color: var(--color-muted);
+  font-size: 0.96rem;
+  line-height: 1.65;
+  margin-bottom: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+p:last-child {
+  margin-bottom: 0;
 }
 
 code {
-  color: #e0f2fe;
+  border: 1px solid rgba(4, 217, 255, 0.22);
+  border-radius: 6px;
+  background: var(--color-soft);
+  color: #075565;
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding: 0.1rem 0.3rem;
+  overflow-wrap: anywhere;
+}
+
+a {
+  color: #007f94;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  text-decoration-color: rgba(4, 217, 255, 0.55);
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  color: #005d6e;
 }
 
 .auth-state {
   align-items: flex-start;
   display: grid;
-  gap: 1rem;
+  gap: 0.85rem;
+  min-width: 0;
 }
 
 .notice {
-  border-left: 3px solid #38bdf8;
-  padding-left: 1rem;
+  border-left: 3px solid var(--color-accent);
+  background: rgba(4, 217, 255, 0.08);
+  border-radius: 0 8px 8px 0;
+  padding: 0.75rem 0.9rem;
 }
 
 .repo-actions {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   gap: 1rem;
   justify-content: space-between;
+  min-width: 0;
+}
+
+.repo-actions > div {
+  min-width: 0;
+}
+
+.repo-actions button {
+  flex: 0 0 auto;
 }
 
 .repo-grid {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  margin-top: 1.5rem;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  margin-top: 1.25rem;
 }
 
 .repo-card {
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  border-radius: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-background-soft);
   display: grid;
-  gap: 1rem;
+  gap: 0.95rem;
+  min-width: 0;
   padding: 1rem;
 }
 
 .repo-card header {
   align-items: flex-start;
-  display: flex;
-  gap: 1rem;
-  justify-content: space-between;
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .repo-card h3 {
-  margin: 0 0 0.5rem;
+  overflow-wrap: anywhere;
 }
 
-.repo-card span {
+.repo-card span,
+.branch-label {
+  border: 1px solid rgba(0, 174, 202, 0.18);
   border-radius: 999px;
-  background: rgba(56, 189, 248, 0.14);
-  color: #7dd3fc;
-  font-size: 0.8rem;
-  padding: 0.25rem 0.6rem;
+  background: rgba(4, 217, 255, 0.12);
+  color: #005d6e;
+  display: inline-flex;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.25;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  padding: 0.24rem 0.55rem;
 }
 
 .repo-meta {
   display: grid;
   gap: 0.75rem;
   margin: 0;
+  min-width: 0;
 }
 
 .repo-meta div {
   display: grid;
   gap: 0.2rem;
+  min-width: 0;
 }
 
 .repo-meta dt {
-  color: #94a3b8;
-  font-size: 0.78rem;
+  color: #697982;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
 .repo-meta dd {
-  color: #e2e8f0;
+  color: var(--color-text);
   margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .error-message {
-  color: #fecdd3;
+  color: var(--color-danger);
+  font-weight: 700;
 }
 
 .selected-repository {
-  border-left: 3px solid #22c55e;
+  border-left: 3px solid var(--color-accent);
+  background: rgba(4, 217, 255, 0.08);
+  border-radius: 0 8px 8px 0;
   margin: 1rem 0;
-  padding-left: 1rem;
+  min-width: 0;
+  padding: 0.75rem 0.9rem;
+}
+
+.selected-repository p {
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
 }
 
 .recent-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.recent-list button {
+  background: var(--color-surface-strong);
+  box-shadow: none;
+  color: #006a7c;
+  min-height: 2.35rem;
 }
 
 .graph-layout {
   display: grid;
-  gap: 1.5rem;
-  margin-top: 1.25rem;
+  gap: 1rem;
+  margin-top: 1.15rem;
+  min-width: 0;
 }
 
 .graph-copy {
-  margin-bottom: 0;
+  margin-bottom: 0.4rem;
 }
 
 .refresh-status {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin: 1rem 0;
+  gap: 0.65rem;
+  margin: 0.75rem 0 0;
 }
 
 .refresh-status p {
+  border: 1px solid rgba(0, 174, 202, 0.14);
+  border-radius: 8px;
+  background: rgba(4, 217, 255, 0.08);
+  color: #32515a;
+  font-size: 0.86rem;
   margin: 0;
+  padding: 0.45rem 0.65rem;
 }
 
 .refresh-controls {
   align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-background-soft);
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.75rem 1rem;
+  padding: 0.8rem;
 }
 
 .refresh-controls p {
+  color: var(--color-muted);
+  font-size: 0.9rem;
   margin: 0;
 }
 
 .auto-refresh-toggle {
   align-items: center;
-  color: #e2e8f0;
+  color: var(--color-text);
   display: inline-flex;
-  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
   font-weight: 700;
+  gap: 0.55rem;
+}
+
+.auto-refresh-toggle input {
+  accent-color: var(--color-accent-strong);
+  height: 1rem;
+  width: 1rem;
 }
 
 .graph-shell {
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  border-radius: 18px;
-  height: 520px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  background: #f8fdfe;
+  height: 34rem;
+  min-width: 0;
   overflow: hidden;
+  position: relative;
+}
+
+.graph-shell > p {
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+  text-align: center;
 }
 
 .graph-shell .react-flow {
-  background: rgba(2, 6, 23, 0.72);
+  background:
+    radial-gradient(circle at top left, rgba(4, 217, 255, 0.14), transparent 22rem),
+    #fbfeff;
+}
+
+.react-flow__attribution {
+  background: rgba(255, 255, 255, 0.74);
+  color: #64727a;
+}
+
+.react-flow__controls {
+  box-shadow: 0 12px 28px rgba(43, 58, 65, 0.12);
+}
+
+.react-flow__controls-button {
+  background: rgba(255, 255, 255, 0.95);
+  border: 0;
+  border-bottom-color: var(--color-border);
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--color-text);
+  min-height: 0;
+  padding: 0;
+  transform: none;
+}
+
+.react-flow__controls-button:not(:disabled):hover {
+  background: var(--color-soft);
+  transform: none;
 }
 
 .commit-node {
-  border: 1px solid rgba(56, 189, 248, 0.42);
-  border-radius: 16px;
-  background: rgba(15, 23, 42, 0.94);
-  box-shadow: 0 18px 42px rgba(2, 6, 23, 0.32);
-  color: #e2e8f0;
+  border: 1px solid rgba(0, 174, 202, 0.36);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 16px 34px rgba(43, 58, 65, 0.16);
+  color: var(--color-text);
   display: grid;
-  gap: 0.45rem;
-  min-width: 180px;
+  gap: 0.42rem;
+  min-width: 14rem;
+  max-width: 16rem;
   padding: 0.85rem;
   position: relative;
 }
 
 .commit-node__handle {
-  background: #38bdf8;
-  border: 2px solid #082f49;
+  background: var(--color-accent);
+  border: 2px solid #ffffff;
   height: 10px;
   width: 10px;
 }
 
 .commit-node p {
+  color: #52656d;
+  font-size: 0.78rem;
+  line-height: 1.45;
   margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .commit-node__sha {
-  color: #7dd3fc;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: #007f94;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
 }
 
 .commit-node__message {
-  color: #f8fafc;
-  font-weight: 700;
+  color: var(--color-text) !important;
+  display: -webkit-box;
+  font-weight: 800;
+  line-clamp: 3;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 .branch-labels {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
-}
-
-.branch-label {
-  border-radius: 999px;
-  background: rgba(34, 197, 94, 0.16);
-  color: #86efac;
-  font-size: 0.72rem;
-  padding: 0.18rem 0.5rem;
+  min-width: 0;
 }
 
 .commit-details {
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  border-radius: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-background-soft);
+  min-width: 0;
+  overflow: hidden;
   padding: 1rem;
 }
 
@@ -284,12 +539,85 @@ code {
   margin-top: 0;
 }
 
-.commit-details a {
-  color: #7dd3fc;
+.commit-details p,
+.commit-details li {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.commit-details ul {
+  display: grid;
+  gap: 0.4rem;
+  list-style-position: inside;
+  margin: 0;
+  padding: 0;
 }
 
 .detail-grid {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  min-width: 0;
+}
+
+.detail-grid > div {
+  border: 1px solid rgba(23, 32, 38, 0.08);
+  border-radius: 8px;
+  background: #ffffff;
+  min-width: 0;
+  padding: 0.85rem;
+}
+
+@media (min-width: 720px) {
+  .app-shell {
+    gap: 1.5rem;
+    padding: 4rem 1.5rem 5rem;
+  }
+
+  .hero,
+  .panel {
+    padding: 1.75rem;
+  }
+
+  h1 {
+    font-size: 4.25rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .repo-actions {
+    display: grid;
+  }
+
+  .repo-actions button {
+    width: 100%;
+  }
+
+  .repo-card header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .graph-shell {
+    height: 28rem;
+  }
+
+  h1 {
+    font-size: 2.55rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-shell {
+    padding-inline: 0.75rem;
+  }
+
+  .hero,
+  .panel {
+    padding: 1rem;
+  }
+
+  h1 {
+    font-size: 2.2rem;
+  }
 }

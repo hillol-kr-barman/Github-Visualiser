@@ -4,7 +4,7 @@ import type { CommitGraph, CommitGraphNode } from './types'
 export type CommitNodeData = CommitGraphNode
 export type CommitFlowNode = Node<CommitNodeData, 'commit'>
 
-const edgeStyle = { stroke: '#38bdf8', strokeWidth: 2 }
+const edgeStyle = { stroke: '#04d9ff', strokeWidth: 2 }
 
 function toFlowEdge(edge: { id: string; source: string; target: string }): Edge {
   return {
@@ -14,7 +14,7 @@ function toFlowEdge(edge: { id: string; source: string; target: string }): Edge 
     animated: false,
     type: 'smoothstep',
     style: edgeStyle,
-    markerEnd: { type: MarkerType.ArrowClosed, color: '#38bdf8' },
+    markerEnd: { type: MarkerType.ArrowClosed, color: '#04d9ff' },
   }
 }
 
