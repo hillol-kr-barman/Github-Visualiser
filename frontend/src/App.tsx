@@ -32,7 +32,7 @@ import {
 } from './lib/supabase'
 
 const nodeTypes: NodeTypes = { commit: CommitNode }
-const AUTO_REFRESH_INTERVAL_MS = 5 * 60 * 1000
+const AUTO_REFRESH_INTERVAL_MS = 5 * 60 * 1000 //Currently 5 Minutes
 
 function App() {
   const [session, setSession] = useState<Session | null>(null)
