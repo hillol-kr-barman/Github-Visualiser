@@ -159,40 +159,58 @@ For active development, use the local dev setup above — it has hot reload and 
 | How you run the app | Correct value |
 |---|---|
 | Local dev (`npm run dev`) | `http://localhost:5173` |
-| Docker | `http://localhost:8080` |
-| Deployed (Vercel/Railway) | Your live frontend URL, e.g. `https://git-visualiser.vercel.app` |
+| Docker (local) | `http://localhost:8080` |
+| EC2 | `http://<EC2_PUBLIC_IP>:8080` |
 
 If this is wrong, the backend will reject every API call from the frontend with a CORS error.
 
 ---
 
-## Deployment (Vercel + Railway)
+## Deployment (AWS EC2)
 
-The app deploys for free without a custom domain.
+The app runs on a single AWS EC2 t2.micro instance (free tier) using Docker Compose. Both frontend and backend containers run on the same instance.
 
-### Backend — Railway
+### Prerequisites
 
-1. Create a new Railway project and connect the repo.
-2. Set the root directory to `backend/`.
-3. Add all backend environment variables in Railway's dashboard.
-4. Set `FRONTEND_URL` to your Vercel frontend URL (set this after deploying the frontend).
-5. Railway uses `Dockerfile` automatically if one is present.
+- AWS EC2 t2.micro instance (Amazon Linux 2023 or Ubuntu 22.04)
+- Security group with inbound ports: `22` (SSH), `8000` (API), `8080` (Web)
+- A `.pem` key pair for SSH access
 
-### Frontend — Vercel
+See [`deploy/STEPS.txt`](deploy/STEPS.txt) for the full step-by-step guide.
 
-1. Create a new Vercel project and connect the repo.
-2. Set the root directory to `frontend/`.
-3. Add the following environment variables in Vercel's dashboard:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-   - `VITE_API_BASE_URL` — set to your Railway backend URL
-4. Vercel runs `npm run build` automatically.
+### First-time setup
 
-### After both are deployed
+1. SSH into the instance and run the bootstrap script to install Docker:
+   ```bash
+   bash deploy/setup.sh
+   ```
+2. Clone the repo, create `.env` files from the templates in `deploy/`, and fill in your secrets.
+3. Build and start:
+   ```bash
+   docker compose up -d --build
+   ```
 
-- Update `FRONTEND_URL` in Railway to point to the Vercel URL.
-- Add the Vercel URL to your Supabase project's allowed redirect URLs.
-- Add the Vercel URL to your GitHub OAuth App's callback URLs.
+The app will be available at `http://<EC2_PUBLIC_IP>:8080`.
+
+### Deploying updates
+
+From your local machine:
+
+```bash
+bash deploy/deploy.sh
+```
+
+This SSHs into EC2, pulls the latest code, rebuilds the images, and restarts the containers.
+
+### Environment variables for EC2
+
+- Root `.env`: set `VITE_API_BASE_URL=http://<EC2_PUBLIC_IP>:8000`
+- `backend/.env`: set `FRONTEND_URL=http://<EC2_PUBLIC_IP>:8080`
+- In Supabase → Authentication → URL Configuration:
+  - **Site URL**: `http://<EC2_PUBLIC_IP>:8080`
+  - **Redirect URLs**: `http://<EC2_PUBLIC_IP>:8080/**`
+
+> **Note:** EC2 public IPs change on stop/start. Assign an Elastic IP in the AWS console to keep the address stable.
 
 ---
 
@@ -222,6 +240,12 @@ The backend token is a server-side read-only GitHub token — it never reaches t
 ├── docker-compose.yml       # Runs frontend + backend together
 ├── .env                     # Root env — docker-compose reads this for frontend build args
 ├── .env.example             # Template for root .env
+├── deploy/
+│   ├── setup.sh             # Bootstraps Docker on a fresh EC2 instance
+│   ├── deploy.sh            # One-command deploy from local machine to EC2
+│   ├── .env.template        # Root .env template for EC2
+│   ├── backend.env.template # backend/.env template for EC2
+│   └── STEPS.txt            # Full EC2 deployment walkthrough
 │
 ├── frontend/
 │   ├── Dockerfile           # Builds React app, serves with nginx
