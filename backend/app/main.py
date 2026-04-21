@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from app.github import get_repository_graph, list_repositories
 from app.settings import settings
@@ -27,11 +27,20 @@ def public_config() -> dict[str, str]:
     }
 
 
+def _require_github_token(x_github_token: str | None = Header(default=None)) -> str:
+    if not x_github_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="GitHub access token is required. Sign in with GitHub first.",
+        )
+    return x_github_token
+
+
 @app.get("/github/repositories")
-async def github_repositories() -> dict[str, list[dict[str, object]]]:
-    return {"repositories": await list_repositories()}
+async def github_repositories(token: str = Depends(_require_github_token)) -> dict[str, list[dict[str, object]]]:
+    return {"repositories": await list_repositories(token)}
 
 
 @app.get("/github/repositories/{owner}/{repo}/graph")
-async def github_repository_graph(owner: str, repo: str) -> dict[str, object]:
-    return await get_repository_graph(owner, repo)
+async def github_repository_graph(owner: str, repo: str, token: str = Depends(_require_github_token)) -> dict[str, object]:
+    return await get_repository_graph(owner, repo, token)

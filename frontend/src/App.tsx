@@ -10,6 +10,7 @@ import {
   type Edge,
   type Node,
   type NodeTypes,
+  type ReactFlowInstance,
 } from '@xyflow/react'
 import type { Session } from '@supabase/supabase-js'
 import '@xyflow/react/dist/style.css'
@@ -39,6 +40,7 @@ const AUTO_REFRESH_INTERVAL_MS = 5 * 60 * 1000
 
 function App() {
   const [session, setSession] = useState<Session | null>(null)
+  const [githubToken, setGithubToken] = useState<string>(() => sessionStorage.getItem('gh_token') ?? '')
   const [isLoadingSession, setIsLoadingSession] = useState(true)
   const [authError, setAuthError] = useState<string | null>(null)
   const [repositories, setRepositories] = useState<RepositorySummary[]>([])
@@ -76,6 +78,10 @@ function App() {
 
       if (recovered.session) {
         setSession(recovered.session)
+        if (recovered.session.provider_token) {
+          sessionStorage.setItem('gh_token', recovered.session.provider_token)
+          setGithubToken(recovered.session.provider_token)
+        }
         setIsLoadingSession(false)
         return
       }
@@ -85,6 +91,10 @@ function App() {
       if (isMounted) {
         if (error) setAuthError(error.message)
         setSession(data.session)
+        if (data.session?.provider_token) {
+          sessionStorage.setItem('gh_token', data.session.provider_token)
+          setGithubToken(data.session.provider_token)
+        }
         setIsLoadingSession(false)
       }
     }
@@ -95,7 +105,14 @@ function App() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession)
-      if (!nextSession) setIsAutoRefreshEnabled(false)
+      if (nextSession?.provider_token) {
+        sessionStorage.setItem('gh_token', nextSession.provider_token)
+        setGithubToken(nextSession.provider_token)
+      } else if (!nextSession) {
+        sessionStorage.removeItem('gh_token')
+        setGithubToken('')
+        setIsAutoRefreshEnabled(false)
+      }
       setIsLoadingSession(false)
     })
 
@@ -113,7 +130,7 @@ function App() {
     setIsLoadingRepositories(true)
     setRepositoryError(null)
     try {
-      setRepositories(await fetchRepositories())
+      setRepositories(await fetchRepositories(githubToken))
       setHasLoadedRepositories(true)
     } catch (error) {
       setRepositoryError(
@@ -147,7 +164,7 @@ function App() {
     setSelectedCommit(null)
 
     try {
-      const graph = await fetchRepositoryGraph(selectedRepository.full_name)
+      const graph = await fetchRepositoryGraph(selectedRepository.full_name, githubToken)
       const flowGraph = toReactFlowGraph(graph)
       setGraphNodes(flowGraph.nodes)
       setGraphEdges(flowGraph.edges)
@@ -162,7 +179,7 @@ function App() {
       isGraphRefreshInFlight.current = false
       setIsLoadingGraph(false)
     }
-  }, [selectedRepository])
+  }, [selectedRepository, githubToken])
 
   useEffect(() => {
     if (!session || !isAutoRefreshEnabled || !selectedRepository || !hasLoadedGraph) return undefined
@@ -287,6 +304,13 @@ function HomePage({
   onSetAutoRefresh,
   onSelectCommit,
 }: HomePageProps) {
+  const rfInstance = useRef<ReactFlowInstance<Node<CommitGraphNode>, Edge> | null>(null)
+
+  useEffect(() => {
+    if (graphNodes.length > 0) {
+      rfInstance.current?.fitView({ padding: 0.15 })
+    }
+  }, [graphNodes])
   return (
     <main className="mx-auto max-w-225 px-8 pt-12 pb-20 w-full grid gap-10">
 
@@ -553,6 +577,8 @@ function HomePage({
                 edges={graphEdges}
                 nodeTypes={nodeTypes}
                 fitView
+                fitViewOptions={{ padding: 0.15 }}
+                onInit={(instance) => { rfInstance.current = instance }}
                 onNodeClick={(_, node: Node<CommitGraphNode>) => onSelectCommit(node.data)}
               >
                 <Background />

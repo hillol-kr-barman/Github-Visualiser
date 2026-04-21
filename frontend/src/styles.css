@@ -163,6 +163,7 @@
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 6px;
   overflow: hidden;
+  background: #161a1e;
 }
 .react-flow__controls-button {
   background: #161a1e;

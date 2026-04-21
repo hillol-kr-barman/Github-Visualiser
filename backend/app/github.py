@@ -4,8 +4,6 @@ from typing import Any
 import httpx
 from fastapi import HTTPException, status
 
-from app.settings import settings
-
 GITHUB_API_URL = "https://api.github.com"
 
 
@@ -26,10 +24,10 @@ def _repo_summary(repo: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _github_headers() -> dict[str, str]:
+def _github_headers(token: str) -> dict[str, str]:
     return {
         "Accept": "application/vnd.github+json",
-        "Authorization": f"Bearer {settings.github_access_token}",
+        "Authorization": f"Bearer {token}",
         "X-GitHub-Api-Version": "2022-11-28",
     }
 
@@ -88,11 +86,11 @@ def _commit_node(commit: dict[str, Any], branch_labels: list[str]) -> dict[str, 
     }
 
 
-async def list_repositories() -> list[dict[str, Any]]:
-    if not settings.github_access_token:
+async def list_repositories(token: str) -> list[dict[str, Any]]:
+    if not token:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="GitHub repository access is not configured.",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="GitHub access token is required.",
         )
 
     params = {
@@ -105,7 +103,7 @@ async def list_repositories() -> list[dict[str, Any]]:
 
     try:
         async with httpx.AsyncClient(base_url=GITHUB_API_URL, timeout=10.0) as client:
-            response = await client.get("/user/repos", headers=_github_headers(), params=params)
+            response = await client.get("/user/repos", headers=_github_headers(token), params=params)
     except httpx.HTTPError as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
@@ -131,23 +129,23 @@ async def list_repositories() -> list[dict[str, Any]]:
     return [_repo_summary(repo) for repo in response.json()]
 
 
-async def get_repository_graph(owner: str, repo: str) -> dict[str, Any]:
-    if not settings.github_access_token:
+async def get_repository_graph(owner: str, repo: str, token: str) -> dict[str, Any]:
+    if not token:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="GitHub repository access is not configured.",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="GitHub access token is required.",
         )
 
     try:
         async with httpx.AsyncClient(base_url=GITHUB_API_URL, timeout=10.0) as client:
             commits_response = await client.get(
                 f"/repos/{owner}/{repo}/commits",
-                headers=_github_headers(),
+                headers=_github_headers(token),
                 params={"per_page": "50"},
             )
             branches_response = await client.get(
                 f"/repos/{owner}/{repo}/branches",
-                headers=_github_headers(),
+                headers=_github_headers(token),
                 params={"per_page": "100"},
             )
     except httpx.HTTPError as exc:

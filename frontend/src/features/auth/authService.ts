@@ -37,7 +37,7 @@ export async function signInWithGitHub() {
     options: {
       redirectTo: window.location.origin,
       // Keep identity scopes minimal; private repository read access should use GitHub App permissions in later phases.
-      scopes: 'read:user user:email',
+      scopes: 'read:user user:email repo',
     },
   })
 }
