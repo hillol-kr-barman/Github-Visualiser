@@ -237,6 +237,7 @@ function App() {
               graphSync={graphSync}
               lastRefreshError={lastRefreshError}
               isAutoRefreshEnabled={isAutoRefreshEnabled}
+              onSignIn={() => void handleSignIn()}
               onLoadRepositories={() => void handleLoadRepositories()}
               onSelectRepository={handleSelectRepository}
               onLoadGraph={() => void handleLoadGraph()}
@@ -272,6 +273,7 @@ interface HomePageProps {
   graphSync: GraphSyncMetadata | null
   lastRefreshError: string | null
   isAutoRefreshEnabled: boolean
+  onSignIn: () => void
   onLoadRepositories: () => void
   onSelectRepository: (repo: RepositorySummary) => void
   onLoadGraph: () => void
@@ -298,6 +300,7 @@ function HomePage({
   graphSync,
   lastRefreshError,
   isAutoRefreshEnabled,
+  onSignIn,
   onLoadRepositories,
   onSelectRepository,
   onLoadGraph,
@@ -319,7 +322,7 @@ function HomePage({
         <div className="bg-[rgba(248,113,113,0.08)] border border-[rgba(248,113,113,0.25)] rounded-lg px-4 py-3">
           <p className="text-danger text-[0.85rem] m-0">
             {!isSupabaseConfigured
-              ? 'Supabase env vars are not configured — check frontend/.env'
+              ? 'Supabase env vars are not configured'
               : supabaseConfigurationIssue}
           </p>
         </div>
@@ -373,6 +376,29 @@ function HomePage({
         </div>
       </section>
 
+      {/* Sign in to Github*/}
+
+      {session ? null :
+        <section>
+          <div className="bg-surface border border-border rounded-lg px-6 py-8 flex flex-col items-center gap-4 text-center">
+            <h2 className="section-title">Sign in to GitHub to Continue</h2>
+            <p className="text-[0.85rem] text-muted m-0">
+              Connect your GitHub account to load and visualise your repositories.
+            </p>
+            <button
+              type="button"
+              onClick={onSignIn}
+              className="btn flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+              Sign in with GitHub
+            </button>
+          </div>
+        </section>
+      }
+
       {/* Repositories */}
       {session ? (
         <section aria-labelledby="repositories-heading">
@@ -412,11 +438,10 @@ function HomePage({
                   type="button"
                   key={repo.full_name}
                   onClick={() => onSelectRepository(repo)}
-                  className={`font-mono text-[0.72rem] px-3 py-1.25 rounded-[5px] border transition-colors cursor-pointer ${
-                    selectedRepository?.full_name === repo.full_name
-                      ? 'border-accent text-accent bg-[rgba(0,212,220,0.12)]'
-                      : 'border-border text-muted bg-surface hover:border-accent hover:text-accent'
-                  }`}
+                  className={`font-mono text-[0.72rem] px-3 py-1.25 rounded-[5px] border transition-colors cursor-pointer ${selectedRepository?.full_name === repo.full_name
+                    ? 'border-accent text-accent bg-[rgba(0,212,220,0.12)]'
+                    : 'border-border text-muted bg-surface hover:border-accent hover:text-accent'
+                    }`}
                 >
                   {repo.full_name}
                 </button>
@@ -432,22 +457,20 @@ function HomePage({
                 return (
                   <article
                     key={repo.full_name}
-                    className={`bg-surface rounded-lg p-4 grid gap-3 border transition-all hover:-translate-y-px ${
-                      isSelected
-                        ? 'border-accent'
-                        : 'border-border hover:border-[rgba(255,255,255,0.15)]'
-                    }`}
+                    className={`bg-surface rounded-lg p-4 grid gap-3 border transition-all hover:-translate-y-px ${isSelected
+                      ? 'border-accent'
+                      : 'border-border hover:border-[rgba(255,255,255,0.15)]'
+                      }`}
                   >
                     <header className="flex items-start justify-between gap-2">
                       <span className="font-mono text-[0.78rem] font-medium text-text wrap-anywhere">
                         {repo.full_name}
                       </span>
                       <span
-                        className={`text-[0.62rem] px-1.75 py-0.5 rounded-[3px] border shrink-0 ${
-                          repo.visibility === 'public'
-                            ? 'bg-[rgba(63,185,80,0.12)] text-[#3fb950] border-[rgba(63,185,80,0.25)]'
-                            : 'bg-[rgba(255,255,255,0.05)] text-[#6b7685] border-border'
-                        }`}
+                        className={`text-[0.62rem] px-1.75 py-0.5 rounded-[3px] border shrink-0 ${repo.visibility === 'public'
+                          ? 'bg-[rgba(63,185,80,0.12)] text-[#3fb950] border-[rgba(63,185,80,0.25)]'
+                          : 'bg-[rgba(255,255,255,0.05)] text-[#6b7685] border-border'
+                          }`}
                       >
                         {repo.visibility}
                       </span>
@@ -468,11 +491,10 @@ function HomePage({
                     <button
                       type="button"
                       onClick={() => onSelectRepository(repo)}
-                      className={`w-full text-[0.78rem] px-1.75 py-1.75 rounded-[5px] border transition-colors cursor-pointer ${
-                        isSelected
-                          ? 'border-accent text-accent bg-[rgba(0,212,220,0.12)]'
-                          : 'border-border text-muted bg-transparent hover:border-accent hover:text-accent'
-                      }`}
+                      className={`w-full text-[0.78rem] px-1.75 py-1.75 rounded-[5px] border transition-colors cursor-pointer ${isSelected
+                        ? 'border-accent text-accent bg-[rgba(0,212,220,0.12)]'
+                        : 'border-border text-muted bg-transparent hover:border-accent hover:text-accent'
+                        }`}
                     >
                       {isSelected ? '✓ Selected' : 'Select repository'}
                     </button>
