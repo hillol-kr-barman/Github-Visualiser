@@ -32,13 +32,13 @@ const projects = [
 
 export default function About() {
   return (
-    <main className="mx-auto max-w-[800px] px-8 pt-12 pb-20 w-full">
+    <main className="mx-auto max-w-[800px] px-4 sm:px-8 pt-8 sm:pt-12 pb-20 w-full">
       {/* Page header */}
       <div className="mb-10">
         <p className="font-mono text-[0.72rem] text-accent uppercase tracking-[0.08em] mb-3">
           About the developer
         </p>
-        <h1 className="text-[clamp(2.2rem,4vw,3rem)] font-bold tracking-[-0.03em] leading-[1.05] text-text mb-3">
+        <h1 className="text-[clamp(1.7rem,5vw,3rem)] font-bold tracking-[-0.03em] leading-[1.05] text-text mb-3">
           Hillol Barman
         </h1>
         <p className="text-[1rem] text-muted m-0">
@@ -47,7 +47,7 @@ export default function About() {
       </div>
 
       {/* Profile */}
-      <section className="grid grid-cols-[100px_1fr] gap-8 items-start mb-10">
+      <section className="grid grid-cols-1 min-[480px]:grid-cols-[100px_1fr] gap-6 sm:gap-8 items-start mb-10">
         {/* Avatar */}
         <div className="relative flex items-center justify-center size-[100px]">
           <div

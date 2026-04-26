@@ -4,7 +4,7 @@ import { socials } from './siteData/socials'
 export default function Footer() {
   return (
     <footer className="border-t border-[rgba(255,255,255,0.07)] mt-auto">
-      <div className="mx-auto max-w-[900px] px-8 py-6 flex items-center justify-between flex-wrap gap-4">
+      <div className="mx-auto max-w-[900px] px-4 sm:px-8 py-6 flex items-center justify-between flex-wrap gap-4">
         <p className="text-[0.78rem] text-[#6b7685] m-0">
           &copy; {new Date().getFullYear()}{' '}
           <Link to="/about" className="text-[#9aa3b0] hover:text-[#00d4dc] transition-colors no-underline">

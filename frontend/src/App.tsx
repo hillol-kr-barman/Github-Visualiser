@@ -312,7 +312,7 @@ function HomePage({
     }
   }, [graphNodes])
   return (
-    <main className="mx-auto max-w-225 px-8 pt-12 pb-20 w-full grid gap-10">
+    <main className="mx-auto max-w-225 px-4 sm:px-8 pt-8 sm:pt-12 pb-20 w-full grid gap-10">
 
       {/* Supabase config warning */}
       {!isSupabaseConfigured || supabaseConfigurationIssue ? (
@@ -331,7 +331,7 @@ function HomePage({
           <p className="font-mono text-[0.72rem] text-accent uppercase tracking-[0.08em] mb-4">
             Portfolio Project · Hillol Barman
           </p>
-          <h1 className="text-[clamp(2.8rem,5vw,3.8rem)] font-bold tracking-[-0.03em] leading-[1.05] mb-4 max-w-none">
+          <h1 className="text-[clamp(1.9rem,6vw,3.8rem)] font-bold tracking-[-0.03em] leading-[1.05] mb-4 max-w-none">
             Git<br />
             <span className="text-accent">Visualiser</span>
           </h1>
