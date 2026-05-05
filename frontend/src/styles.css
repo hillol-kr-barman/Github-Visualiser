@@ -1,4 +1,6 @@
+@import "@hillolbarman/ui/styles.css";
 @import "tailwindcss";
+@source "../node_modules/@hillolbarman/ui/dist/index.js";
 
 @theme {
   --color-accent: #00d4dc;

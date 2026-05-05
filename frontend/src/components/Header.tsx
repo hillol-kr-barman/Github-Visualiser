@@ -1,96 +1,70 @@
-import { Link, useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import type { Session } from '@supabase/supabase-js'
+import { SiteHeader } from '@hillolbarman/ui'
+import type { AuthUser } from '@hillolbarman/ui'
 import { signOut } from '../features/auth/authService'
 
 interface HeaderProps {
   session: Session | null
   isLoadingSession: boolean
-  authError: string | null
   onSignIn: () => void
+  authError: string | null
 }
 
-export default function Header({ session, isLoadingSession, authError, onSignIn }: HeaderProps) {
+const logo = (
+  <div className="size-7 rounded-[6px] bg-accent flex items-center justify-center flex-shrink-0">
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+      <circle cx="7.5" cy="2" r="1.8" fill="#0a0c0d" />
+      <circle cx="2.5" cy="12.5" r="1.8" fill="#0a0c0d" />
+      <circle cx="12.5" cy="12.5" r="1.8" fill="#0a0c0d" />
+      <line x1="7.5" y1="3.8" x2="2.5" y2="10.7" stroke="#0a0c0d" strokeWidth="1.4" />
+      <line x1="7.5" y1="3.8" x2="12.5" y2="10.7" stroke="#0a0c0d" strokeWidth="1.4" />
+    </svg>
+  </div>
+)
+
+const navItems = [
+  { name: 'Home', href: '/' },
+  { name: 'About', href: '/about' },
+]
+
+export default function Header({ session, isLoadingSession, onSignIn, authError }: HeaderProps) {
   const { pathname } = useLocation()
-  const userLabel =
-    session?.user.email ?? session?.user.user_metadata?.user_name ?? session?.user.id
+  const navigate = useNavigate()
+
+  const currentUser: AuthUser | null = !isLoadingSession && session
+    ? {
+        id: session.user.id,
+        name: session.user.user_metadata?.user_name ?? session.user.email ?? session.user.id,
+        email: session.user.email ?? '',
+      }
+    : null
+
+  function handleNavigate(to: string) {
+    if (to === '/login' || to.startsWith('/login?')) {
+      onSignIn()
+    } else {
+      navigate(to)
+    }
+  }
 
   return (
-    <header className="sticky top-0 z-[100] flex items-center justify-between h-14 px-4 sm:px-8 border-b border-[rgba(255,255,255,0.07)] bg-[rgba(14,16,18,0.85)] backdrop-blur-[12px]">
-      {/* Logo */}
-      <Link
-        to="/"
-        className="flex items-center gap-[0.55rem] no-underline hover:no-underline shrink-0"
-      >
-        <div className="size-7 rounded-[6px] bg-[#00d4dc] flex items-center justify-center flex-shrink-0">
-          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-            <circle cx="7.5" cy="2" r="1.8" fill="#0a0c0d" />
-            <circle cx="2.5" cy="12.5" r="1.8" fill="#0a0c0d" />
-            <circle cx="12.5" cy="12.5" r="1.8" fill="#0a0c0d" />
-            <line x1="7.5" y1="3.8" x2="2.5" y2="10.7" stroke="#0a0c0d" strokeWidth="1.4" />
-            <line x1="7.5" y1="3.8" x2="12.5" y2="10.7" stroke="#0a0c0d" strokeWidth="1.4" />
-          </svg>
-        </div>
-        <span className="text-[#eef0f3] text-[0.95rem] font-semibold tracking-[-0.01em] hidden min-[380px]:inline">
-          Git Visualiser
-        </span>
-      </Link>
-
-      {/* Nav */}
-      <nav className="flex items-center gap-0.5 sm:gap-1 min-w-0">
-        <Link
-          to="/"
-          className={`hidden sm:inline-flex text-[0.85rem] font-medium px-[10px] py-[5px] rounded-[5px] transition-colors duration-150 no-underline hover:no-underline ${
-            pathname === '/'
-              ? 'text-[#eef0f3] bg-[rgba(255,255,255,0.05)]'
-              : 'text-[#9aa3b0] hover:text-[#eef0f3] hover:bg-[rgba(255,255,255,0.05)]'
-          }`}
-        >
-          Home
-        </Link>
-        <Link
-          to="/about"
-          className={`text-[0.85rem] font-medium px-[10px] py-[5px] rounded-[5px] transition-colors duration-150 no-underline hover:no-underline ${
-            pathname === '/about'
-              ? 'text-[#00d4dc]'
-              : 'text-[#9aa3b0] hover:text-[#eef0f3] hover:bg-[rgba(255,255,255,0.05)]'
-          }`}
-        >
-          About
-        </Link>
-
-        {/* Auth chip */}
-        {isLoadingSession ? null : session ? (
-          <div className="flex items-center gap-[6px] ml-1 sm:ml-2 bg-[#161a1e] border border-[rgba(255,255,255,0.07)] rounded-full px-2 sm:px-3 py-1 min-w-0">
-            <span className="size-[7px] rounded-full bg-[#3fb950] flex-shrink-0" />
-            <span className="font-mono text-[0.72rem] text-[#9aa3b0] max-w-[5rem] sm:max-w-[14rem] truncate hidden min-[480px]:block">
-              {userLabel}
-            </span>
-            <button
-              type="button"
-              onClick={() => void signOut()}
-              className="text-[0.72rem] text-[#6b7685] hover:text-[#00d4dc] transition-colors bg-transparent border-0 cursor-pointer p-0 sm:ml-1 font-sans whitespace-nowrap"
-            >
-              Sign out
-            </button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={onSignIn}
-            className="ml-1 sm:ml-2 text-[0.82rem] font-medium text-[#9aa3b0] bg-transparent border border-[rgba(255,255,255,0.07)] rounded-full px-[10px] sm:px-[14px] py-[5px] cursor-pointer hover:border-[#00d4dc] hover:text-[#00d4dc] transition-colors font-sans whitespace-nowrap"
-          >
-            <span className="hidden sm:inline">Sign in with GitHub</span>
-            <span className="sm:hidden">Sign in</span>
-          </button>
-        )}
-      </nav>
-
-      {/* Auth error banner */}
+    <>
+      <SiteHeader
+        logo={logo}
+        siteName="Git Visualiser"
+        navItems={navItems}
+        currentPath={pathname}
+        currentUser={currentUser}
+        onNavigate={handleNavigate}
+        onLogout={() => void signOut()}
+        containerClassName="px-4 sm:px-8"
+      />
       {authError ? (
-        <div className="absolute top-full left-0 right-0 bg-[#1c2128] border-b border-[rgba(255,255,255,0.07)] px-4 sm:px-8 py-2">
+        <div className="bg-[#1c2128] border-b border-[rgba(255,255,255,0.07)] px-4 sm:px-8 py-2">
           <p className="text-[#f87171] text-[0.82rem] m-0">{authError}</p>
         </div>
       ) : null}
-    </header>
+    </>
   )
 }

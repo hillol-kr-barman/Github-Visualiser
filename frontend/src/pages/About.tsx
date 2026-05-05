@@ -1,3 +1,6 @@
+import { ProjectCard } from '@hillolbarman/ui'
+import type { Project } from '@hillolbarman/ui'
+
 const skills = [
   { name: 'JavaScript', dot: '#f7df1e' },
   { name: 'TypeScript', dot: '#3178c6' },
@@ -15,18 +18,22 @@ const skills = [
   { name: 'Monaco Editor', dot: '#0078d4' },
 ]
 
-const projects = [
+const projects: Project[] = [
   {
-    name: 'Lazymate',
-    desc: 'Portfolio site and code playground — polished landing page, project showcase, About/CV section, a logged-in code editor, newsletter signup, and Stripe-powered support tiers.',
-    tags: ['React 19', 'FastAPI', 'Supabase', 'Stripe', 'Monaco Editor', 'Tailwind CSS 4'],
-    href: 'https://lazymate.dev',
+    id: 1,
+    title: 'Lazymate',
+    content: 'Portfolio site and code playground — polished landing page, project showcase, About/CV section, a logged-in code editor, newsletter signup, and Stripe-powered support tiers.',
+    projectTechstack: 'React 19, FastAPI, Supabase, Stripe, Monaco Editor, Tailwind CSS 4',
+    imageSrc: 'https://opengraph.githubassets.com/0/hillol-kr-barman/lazymate',
+    gitLink: 'https://lazymate.dev',
   },
   {
-    name: 'Git Visualiser',
-    desc: 'Interactive commit-graph explorer for GitHub repositories. Visualises branches, parent relationships, and recent activity — read-only, OAuth-backed.',
-    tags: ['React', 'TypeScript', 'React Flow', 'Supabase', 'FastAPI'],
-    href: 'https://github.com/hillol-kr-barman/Github-Visualiser',
+    id: 2,
+    title: 'Git Visualiser',
+    content: 'Interactive commit-graph explorer for GitHub repositories. Visualises branches, parent relationships, and recent activity — read-only, OAuth-backed.',
+    projectTechstack: 'React, TypeScript, React Flow, Supabase, FastAPI',
+    imageSrc: 'https://opengraph.githubassets.com/0/hillol-kr-barman/Github-Visualiser',
+    gitLink: 'https://github.com/hillol-kr-barman/Github-Visualiser',
   },
 ]
 
@@ -158,28 +165,9 @@ export default function About() {
       {/* Projects */}
       <section className="mb-10">
         <p className="text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-[#6b7685] mb-4">Projects</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-1 gap-4">
           {projects.map((project) => (
-            <a
-              key={project.name}
-              href={project.href}
-              target="_blank"
-              rel="noreferrer"
-              className="block bg-surface border border-border rounded-lg p-5 hover:border-[rgba(255,255,255,0.15)] hover:-translate-y-px transition-all no-underline group"
-            >
-              <div className="flex items-start justify-between mb-2">
-                <span className="text-[0.88rem] font-semibold text-text">{project.name}</span>
-                <span className="text-[#6b7685] group-hover:text-accent transition-colors text-lg leading-none ml-2 shrink-0">↗</span>
-              </div>
-              <p className="text-[0.8rem] text-[#6b7685] leading-[1.55] mb-4">{project.desc}</p>
-              <div className="flex flex-wrap gap-[5px]">
-                {project.tags.map((tag) => (
-                  <span key={tag} className="font-mono text-[0.65rem] bg-[rgba(255,255,255,0.04)] border border-border text-[#6b7685] px-1.75 py-0.5 rounded-[3px]">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </a>
+            <ProjectCard key={project.id} project={project} variant="list" />
           ))}
         </div>
       </section>
