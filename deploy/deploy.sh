@@ -23,4 +23,4 @@ ssh -i "$EC2_KEY" "$EC2_USER@$EC2_HOST" bash <<EOF
 EOF
 
 echo ""
-echo "=== Done — http://$EC2_HOST:8080 ==="
+echo "=== Done — https://$(grep DUCKDNS_SUBDOMAIN ../.env | cut -d= -f2).duckdns.org ==="

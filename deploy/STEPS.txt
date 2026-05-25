@@ -1,76 +1,100 @@
 ============================================================
-  Git Visualiser — EC2 Deployment Steps
+  Git Visualiser — EC2 Deployment Steps (HTTPS via DuckDNS + Caddy)
 ============================================================
+
+--- PART 0: DuckDNS (free SSL subdomain) ---
+
+1. Go to https://www.duckdns.org and sign in with Google or GitHub.
+2. Create a subdomain (e.g. "git-visualiser") → you get git-visualiser.duckdns.org
+3. Set the "current ip" to your EC2 Public IP and click "update ip".
+
 
 --- PART 1: AWS Console ---
 
-1. Launch EC2 instance
+4. Launch EC2 instance
    - AMI:           Amazon Linux 2023 (or Ubuntu 22.04 LTS)
    - Instance type: t2.micro (free tier)
    - Key pair:      Create or select an existing .pem key
    - Storage:       20 GB gp3 (default is fine)
 
-2. Configure Security Group — open these inbound ports:
-   Port 22   (SSH)   — Source: My IP
-   Port 8000 (API)   — Source: 0.0.0.0/0
-   Port 8080 (Web)   — Source: 0.0.0.0/0
+5. Configure Security Group — open these inbound ports:
+   Port 22    (SSH)    — Source: My IP
+   Port 80    (HTTP)   — Source: 0.0.0.0/0  (Caddy: Let's Encrypt challenge)
+   Port 443   (HTTPS)  — Source: 0.0.0.0/0  (Frontend)
+   Port 8000  (HTTPS)  — Source: 0.0.0.0/0  (Backend API)
 
-3. Note your instance's Public IPv4 address (shown in EC2 console).
+6. Note your instance's Public IPv4 address (shown in EC2 console).
+   Assign an Elastic IP so it doesn't change on stop/start.
 
 
 --- PART 2: On your LOCAL machine ---
 
-4. Copy env templates and fill in your EC2 IP:
+7. Copy env templates and fill in your values:
 
-   cp deploy/.env.template .env
    cp deploy/backend.env.template backend/.env
 
-   Replace every occurrence of EC2_PUBLIC_IP in both files
-   with your actual EC2 public IP (e.g. 54.123.45.67).
+   Edit backend/.env:
+   - Replace YOUR_SUBDOMAIN with your DuckDNS subdomain name
+     (e.g. if URL is git-visualiser.duckdns.org, use git-visualiser)
+   - Fill in SUPABASE_URL, SUPABASE_ANON_KEY, GITHUB_ACCESS_TOKEN
 
-5. Update Supabase Auth redirect URLs:
+8. Create a root .env file:
+
+   cat > .env <<EOF
+   VITE_API_BASE_URL=https://YOUR_SUBDOMAIN.duckdns.org:8000
+   VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+   DUCKDNS_SUBDOMAIN=YOUR_SUBDOMAIN
+   EOF
+
+   Replace YOUR_SUBDOMAIN in both VITE_API_BASE_URL and DUCKDNS_SUBDOMAIN.
+
+9. Update Supabase Auth redirect URLs:
    Go to Supabase → Authentication → URL Configuration
    Add to "Redirect URLs":
-     http://EC2_PUBLIC_IP:8080
-     http://EC2_PUBLIC_IP:8080/**
+     https://YOUR_SUBDOMAIN.duckdns.org
+     https://YOUR_SUBDOMAIN.duckdns.org/**
 
-6. Push/commit your deploy/ folder to Git (templates only — .env files
-   are in .gitignore and must NOT be committed).
+10. Commit and push the deploy/ folder (templates only — .env files are
+    in .gitignore and must NOT be committed).
 
 
 --- PART 3: On the EC2 INSTANCE ---
 
-7. SSH in:
-   chmod 400 your-key.pem
-   ssh -i your-key.pem ec2-user@EC2_PUBLIC_IP        # Amazon Linux
-   # OR
-   ssh -i your-key.pem ubuntu@EC2_PUBLIC_IP           # Ubuntu
+11. SSH in:
+    chmod 400 your-key.pem
+    ssh -i your-key.pem ec2-user@EC2_PUBLIC_IP        # Amazon Linux
+    # OR
+    ssh -i your-key.pem ubuntu@EC2_PUBLIC_IP           # Ubuntu
 
-8. Run the bootstrap script:
-   curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/deploy/setup.sh | bash
-   # OR after cloning:
-   bash deploy/setup.sh
+12. Run the bootstrap script:
+    curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/deploy/setup.sh | bash
+    # OR after cloning:
+    bash deploy/setup.sh
 
-9. Log out and back in (for Docker group):
-   exit
-   ssh -i your-key.pem ec2-user@EC2_PUBLIC_IP
+13. Log out and back in (for Docker group):
+    exit
+    ssh -i your-key.pem ec2-user@EC2_PUBLIC_IP
 
-10. Clone your repo:
+14. Clone your repo:
     git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
     cd YOUR_REPO
 
-11. Create .env files on the instance:
+15. Create .env files on the instance:
     nano .env           # paste contents from your local .env
     nano backend/.env   # paste contents from your local backend/.env
 
-12. Build and start:
+16. Build and start:
     docker compose up -d --build
 
-13. Verify:
-    docker compose ps          # both services should show "Up"
+17. Verify:
+    docker compose ps          # all 3 services (backend, frontend, caddy) should show "Up"
     docker compose logs -f     # watch for errors (Ctrl+C to stop)
 
-    Open in browser: http://EC2_PUBLIC_IP:8080
+    Caddy will automatically obtain a Let's Encrypt SSL certificate on first start.
+    This takes ~30 seconds. Then open:
+      https://YOUR_SUBDOMAIN.duckdns.org         ← frontend
+      https://YOUR_SUBDOMAIN.duckdns.org:8000    ← backend API
 
 
 --- USEFUL COMMANDS ---
@@ -78,50 +102,26 @@
 Stop:        docker compose down
 Restart:     docker compose restart
 Rebuild:     docker compose up -d --build
-Logs:        docker compose logs -f [backend|frontend]
+Logs:        docker compose logs -f [backend|frontend|caddy]
 Shell:       docker compose exec backend bash
+Caddy logs:  docker compose logs caddy
 
 
 --- NOTES ---
 
-- The frontend image is built with VITE_API_BASE_URL baked in at
-  compile time. If your EC2 IP changes, you must rebuild: docker compose up -d --build
+- The frontend image is built with VITE_API_BASE_URL baked in at compile time.
+  If your subdomain or EC2 IP changes, you must rebuild: docker compose up -d --build
+
+- DuckDNS IP update: if your EC2 IP changes (e.g. after stop/start without Elastic IP),
+  log in to duckdns.org and update the IP manually, or use their auto-update script.
+
+- SSL certificate renewal is fully automatic — Caddy handles it in the background.
+
+- Caddy stores cert data in the "caddy_data" Docker volume. Do not delete this volume
+  or Caddy will re-request a cert on next start (Let's Encrypt rate limits apply).
 
 - Free tier note: t2.micro has 1 GB RAM. The first docker compose build
   may be slow (~5-10 min). Subsequent starts are fast.
 
-- To keep the app running after you disconnect, docker compose up -d
-  already runs in detached mode. Docker restarts containers on reboot
-  because restart: unless-stopped is set in docker-compose.yml.
-
-- Elastic IP: EC2 public IPs change every time you stop/start the instance.
-  Assign a free Elastic IP in the EC2 console to keep the address stable.
-
-
---- OPTIONAL: Move frontend to Vercel (EC2 backend only) ---
-
-This is the cleaner long-term setup: Vercel serves the frontend for free
-with a CDN and auto-deploys; EC2 only runs the backend.
-
-1. On EC2, stop the frontend container and only run the backend:
-     docker compose up -d backend
-
-2. In Vercel, import your GitHub repo and set these build env vars:
-     VITE_API_BASE_URL    = http://EC2_PUBLIC_IP:8000
-     VITE_SUPABASE_URL    = https://your-project.supabase.co
-     VITE_SUPABASE_ANON_KEY = your-anon-key
-
-3. Update backend/.env on EC2:
-     FRONTEND_URL=https://your-app.vercel.app   # for CORS
-
-4. Update Supabase Auth redirect URLs to include:
-     https://your-app.vercel.app
-     https://your-app.vercel.app/**
-
-!! MIXED CONTENT WARNING !!
-   Vercel serves over HTTPS. If your EC2 backend is plain HTTP,
-   browsers will block API calls (mixed content policy).
-   Fix: add Caddy as a reverse proxy on EC2 to get free auto-SSL.
-   Ask Claude to set this up when you're ready — it's straightforward.
 
 ============================================================
