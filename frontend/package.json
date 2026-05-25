@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@hillolbarman/ui": "^0.1.8",
+    "@hillolbarman/ui": "^0.2.3",
     "@supabase/supabase-js": "^2.49.1",
     "@vitejs/plugin-react": "^4.3.4",
     "@xyflow/react": "^12.10.2",

@@ -58,7 +58,6 @@ export default function Header({ session, isLoadingSession, onSignIn, authError 
         currentUser={currentUser}
         onNavigate={handleNavigate}
         onLogout={() => void signOut()}
-        containerClassName="px-4 sm:px-8"
       />
       {authError ? (
         <div className="bg-[#1c2128] border-b border-[rgba(255,255,255,0.07)] px-4 sm:px-8 py-2">
