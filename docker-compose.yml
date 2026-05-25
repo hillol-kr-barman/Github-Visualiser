@@ -20,7 +20,9 @@ services:
     restart: unless-stopped
 
   caddy:
-    image: caddy:2-alpine
+    build:
+      context: .
+      dockerfile: Dockerfile.caddy
     ports:
       - "80:80"
       - "443:443"
@@ -29,6 +31,8 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
+    environment:
+      - DUCKDNS_TOKEN=${DUCKDNS_TOKEN}
     depends_on:
       - frontend
       - backend
