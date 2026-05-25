@@ -1,10 +1,7 @@
-# Replace YOUR_SUBDOMAIN with your actual DuckDNS subdomain name (without .duckdns.org)
-# Example: if your URL is git-visualiser.duckdns.org, set it to git-visualiser
-
-{$DUCKDNS_SUBDOMAIN}.duckdns.org {
+git-visualiser.duckdns.org {
     reverse_proxy frontend:80
 }
 
-{$DUCKDNS_SUBDOMAIN}.duckdns.org:8000 {
+git-visualiser.duckdns.org:8000 {
     reverse_proxy backend:8000
 }
